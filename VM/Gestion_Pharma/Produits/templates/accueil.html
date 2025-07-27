@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block produit.html %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+      <div class="pharma-animation my-4" role="presentation" aria-hidden="true">
+        <div class="pill pill1" title="Animation de gélule bleue"></div>
+        <div class="pill pill2" title="Animation de gélule verte"></div>
+        <div class="pill pill3" title="Animation de gélule orange"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="jumbotron py-5">
+    <h1 class="display-4">Bienvenue sur <strong>Gestion Pharma</strong> !</h1>
+    <p class="lead">Votre plateforme de gestion de pharmacie moderne et efficace.</p>
+    <hr class="my-4">
+    <p>Utilisez le menu ci-dessus pour accéder aux fonctionnalités principales.</p>
+    <a href="{% url 'produit' %}" class="btn btn-primary btn-lg mt-3">Voir les produits</a>
+  </div>
+</div>
+
+<style>
+  body {
+    min-height: 100vh;
+    background: linear-gradient(120deg, #e0e7ff 0%, #f0fdfa 50%, #c7d2fe 100%);
+    background-attachment: fixed;
+  }
+
+  .pharma-animation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+    height: 100px;
+  }
+
+  .pill {
+    width: 48px;
+    height: 24px;
+    border-radius: 24px;
+    position: relative;
+    animation: spin 1.8s linear infinite;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
+  }
+
+  .pill1 {
+    background: linear-gradient(90deg, #4f8cff 50%, #fff 50%);
+    border: 2px solid #4f8cff;
+    animation-delay: 0s;
+  }
+
+  .pill2 {
+    background: linear-gradient(90deg, #43e97b 50%, #fff 50%);
+    border: 2px solid #43e97b;
+    animation-delay: 0.3s;
+  }
+
+  .pill3 {
+    background: linear-gradient(90deg, #ffb347 50%, #fff 50%);
+    border: 2px solid #ffb347;
+    animation-delay: 0.6s;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.15); }
+    100% { transform: rotate(360deg) scale(1); }
+  }
+
+  .jumbotron {
+    text-align: left;
+  }
+  .jumbotron h1 {
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #2563eb;
+    text-shadow: 0 2px 12px rgba(79, 140, 255, 0.08);
+    letter-spacing: 1px;
+  }
+
+  .jumbotron p.lead {
+    font-size: 1.25rem;
+    color: #333;
+    font-weight: 500;
+  }
+
+  .jumbotron p {
+    color: #555;
+    font-size: 1.08rem;
+  }
+
+  @media (max-width: 600px) {
+    .jumbotron h1 {
+      font-size: 2rem;
+    }
+
+    .pharma-animation {
+      gap: 16px;
+      height: 60px;
+    }
+
+    .pill {
+      width: 32px;
+      height: 16px;
+    }
+  }
+</style>
+{% endblock %}

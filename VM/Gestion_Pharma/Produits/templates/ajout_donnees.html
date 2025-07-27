@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion de Pharmacie - Ajout de Produits</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7fa, #bbdefb);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #0288d1, #01579b);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .header i {
+            position: absolute;
+            top: 25px;
+            left: 30px;
+            font-size: 28px;
+        }
+        
+        .form-container {
+            padding: 30px;
+        }
+        
+        .form-section {
+            margin-bottom: 25px;
+        }
+        
+        .form-section h3 {
+            color: #0288d1;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e0f7fa;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+        }
+        
+        .form-group {
+            flex: 1 0 300px;
+            padding: 0 10px;
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #01579b;
+            font-weight: 500;
+            font-size: 15px;
+        }
+        
+        label span {
+            color: #f44336;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0f7fa;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #f5f9ff;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #0288d1;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(2, 136, 209, 0.2);
+            background: white;
+        }
+        
+        input[type="file"] {
+            padding: 8px;
+            background: #f5f9ff;
+        }
+        
+        .error-message {
+            color: #f44336;
+            font-size: 14px;
+            margin-top: 5px;
+            display: block;
+        }
+        
+        .messages {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+        
+        .messages li {
+            list-style: none;
+            color: #f44336;
+            margin-bottom: 5px;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #0288d1, #01579b);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 500;
+            transition: all 0.3s;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(2, 136, 209, 0.4);
+        }
+        
+        .form-footer {
+            text-align: center;
+            padding: 20px;
+            background: #f5f9ff;
+            border-top: 1px solid #e0f7fa;
+            font-size: 14px;
+            color: #0288d1;
+        }
+        
+        .form-footer a {
+            color: #01579b;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .form-group {
+                flex: 1 0 100%;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+        }
+        
+        .file-input-container {
+            position: relative;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        
+        .file-input-label {
+            background: #0288d1;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-input-label:hover {
+            background: #01579b;
+        }
+        
+        .file-name {
+            display: inline-block;
+            margin-left: 10px;
+            color: #0288d1;
+            font-size: 14px;
+        }
+        
+        .error {
+            border-color: #f44336 !important;
+        }
+        
+        .error:focus {
+            box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.2) !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <i class="fas fa-pills"></i>
+            <h1>Ajout de Produits Pharmaceutiques</h1>
+            <p>Tous les champs marqués d'un astérisque (<span style="color:#ff9e80">*</span>) sont obligatoires</p>
+        </div>
+        
+        <div class="form-container">
+            {% if messages %}
+            <ul class="messages">
+                {% for msg in messages %}
+                <li>{{ msg }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            
+            <form class="form-card" method="post" action="" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- Product Information -->
+                <div class="form-section">
+                    <h3><i class="fas fa-box"></i> Information Produit</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nom du produit <span>*</span></label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <span class="error-message">{{ form.name.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Catégorie <span>*</span></label>
+                            {{ form.categorie }}
+                            {% if form.categorie.errors %}
+                                <span class="error-message">{{ form.categorie.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Prix (€) <span>*</span></label>
+                            {{ form.price }}
+                            {% if form.price.errors %}
+                                <span class="error-message">{{ form.price.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Quantité en stock <span>*</span></label>
+                            {{ form.quantite }}
+                            {% if form.quantite.errors %}
+                                <span class="error-message">{{ form.quantite.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Date & Image -->
+                <div class="form-section">
+                    <h3><i class="fas fa-calendar"></i> Date & Image</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Date d'expiration <span>*</span></label>
+                            {{ form.date_expiration }}
+                            {% if form.date_expiration.errors %}
+                                <span class="error-message">{{ form.date_expiration.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Image du produit <span>*</span></label>
+                            <div class="file-input-container">
+                                <label class="file-input-label" for="id_image">
+                                    <i class="fas fa-upload"></i> Choisir une image
+                                </label>
+                                {{ form.image }}
+                                <span id="file-name" class="file-name">Aucun fichier sélectionné</span>
+                            </div>
+                            {% if form.image.errors %}
+                                <span class="error-message">{{ form.image.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Description -->
+                <div class="form-section">
+                    <h3><i class="fas fa-file-alt"></i> Description</h3>
+                    <div class="form-group">
+                        <label>Description du produit <span>*</span></label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <span class="error-message">{{ form.description.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-save"></i> Enregistrer le Produit
+                </button>
+            </form>
+        </div>
+        
+        <div class="form-footer">
+            <p>Système de Gestion de Pharmacie © 2025 | <a href="#">Politique de confidentialité</a> | <a href="#">Support technique</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Update file name display when a file is selected
+        document.getElementById('id_image').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : "Aucun fichier sélectionné";
+            document.getElementById('file-name').textContent = fileName;
+        });
+        
+        // Add focus styling to inputs
+        const inputs = document.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.classList.add('focused');
+            });
+            
+            input.addEventListener('blur', function() {
+                this.classList.remove('focused');
+            });
+        });
+        
+        // Add error class to fields with errors
+        document.querySelectorAll('.error-message').forEach(error => {
+            if (error.textContent.trim() !== '') {
+                const field = error.previousElementSibling;
+                if (field) {
+                    field.classList.add('error');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

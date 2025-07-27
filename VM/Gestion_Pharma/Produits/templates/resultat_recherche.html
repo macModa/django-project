@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{# Main content block for product search results #}
+{% block produit.html %}
+  {# Display Django messages #}
+  {% if messages %}
+    <ul class="message" style="color: red; font-weight: bold;">
+      {% for message in messages %}
+        <li {% if message.tags %} class="{{ message.tags }}" {% endif %} style="color:Green">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  
+
+  <h1 style="color:brown">Recherche de produits: {{request.GET.q.upper}}</h1>
+  <div class="search-container">
+    <form method="GET" action="{% url 'recherche' %}">
+      <!-- Add your form fields here -->
+    </form>
+  </div>
+
+  
+
+  <div class="products-area-wrapper tableView">
+    <div class="products-header">
+      <!-- Table headers here (keep your table header code) -->
+    </div>
+
+    {% if donnees %}
+      {% for n in donnees %}
+        <div class="products-row">
+          <!-- Product row content here -->
+          <button class="cell-more-button">
+            <!-- SVG icon here -->
+          </button>
+          <div class="product-cell image">
+            {% if n.image %}
+              <img src="{{ n.image.url }}" alt="product">
+            {% else %}
+              <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80" alt="default product">
+            {% endif %}
+            <span>{{ n.name }}</span>
+          </div>
+          <div class="product-cell category">
+            <span class="cell-label">categorie</span>
+            {% if n.categorie %}{{ n.categorie.name }}{% endif %}
+          </div>
+          <div class="product-cell status-cell">
+            <span class="cell-label">Status:</span>
+            <span class="status active"><button class="button {{ n.statut_quantite }}">{{ n.quantite }}</button></span>
+          </div>
+          <div class="product-cell sales"><span class="cell-label">prix:</span> {{ n.price }}</div>
+          <div class="product-cell stock"><span class="cell-label">description:</span> {{ n.description }}</div>
+          <div class="product-cell price"><span class="cell-label">date_ajout:</span> {{ n.date_ajout }}</div>
+          <div class="product-cell price"><span class="cell-label">date_expiration:</span> {{ n.date_expiration }}</div>
+          <div class="product-cell price">
+            <span class="cell-label">ACTION:</span>
+            <span class="action-buttons">
+            <a href="{% url 'modifier_donnees' n.id %}" > <i class="bi bi-pencil-fill"></i></a>
+            <a  class="delete_button" data-id="{{ n.id }}"> <i class="fas fa-trash"> </i></a>
+            <a href="{% url 'detail' n.id %}"> <i class="bi bi-eye-fill"></i></a>
+            </span>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <h1>Aucun produit trouvé pour</h1>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{# If you want to add page-specific JS, use this block and reference your static file #}
+{% block extra_js %}
+  <script src="{% static 'script.js' %}"></script>
+{% endblock %}
+
+<script>
+  $(document).ready(function() {
+      // Utiliser .delete_button (avec point pour la classe)
+      $('.delete_button').click(function(e) {
+          e.preventDefault();
+          var button = $(this);
+          // Récupérer l'ID correctement
+          var produitId = button.data('id');
+          
+          if (confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
+              $.ajax({
+                  url: '/produits/suprimer/' + produitId + '/',
+                  type: 'POST',
+                  headers: { 
+                      "X-CSRFToken": '{{ csrf_token }}' 
+                  },
+                  dataType: 'json',
+                  success: function(response) {
+                      if (response.success) {
+                          // Supprimer la ligne du produit
+                          button.closest('.products-row').fadeOut(300, function() {
+                              $(this).remove();
+                          });
+                          alert(response.message);
+                      } else {
+                          alert('Erreur: ' + response.message);
+                      }
+                  },
+                  error: function(xhr) {
+                      alert('Erreur technique: ' + xhr.status + ' - ' + xhr.statusText);
+                  }
+              });
+          }
+      });
+  });
+
+    </script>

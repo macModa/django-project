@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block produit.html %}
+  {% if messages %}
+    <div class="container mt-3">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="container my-5">
+    <h1 class="mb-4">Détails du Produit <span class="text-primary">#{{ produit.id }}</span></h1>
+    <div class="card shadow-lg">
+      <div class="card-header bg-primary text-white">
+        <h2 class="mb-0">{{ produit.name }}</h2>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <!-- Image column -->
+          <div class="col-md-4 mb-4">
+            <div class="text-center">
+              {% if produit.image %}
+                <img src="{{ produit.image.url }}" alt="{{ produit.name }}" class="img-fluid rounded mb-3" style="max-height: 300px;">
+              {% else %}
+                <img src="https://via.placeholder.com/400x300?text=Image+Produit" alt="Image par défaut" class="img-fluid rounded mb-3" style="max-height: 300px;">
+              {% endif %}
+              <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <a href="{% url 'modifier_donnees' produit.id %}" class="btn btn-warning me-md-2">
+                  <i class="bi bi-pencil-fill"></i> Modifier
+                </a>
+                <a href="{% url 'home' %}" class="btn btn-secondary">
+                  <i class="bi bi-arrow-left"></i> Retour
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- Details column -->
+          <div class="col-md-8">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <tbody>
+                  <tr>
+                    <th class="w-25"><i class="bi bi-tag"></i> Catégorie</th>
+                    <td>{% if produit.categorie %}{{ produit.categorie.name }}{% else %}-{% endif %}</td>
+                  </tr>
+                  <tr>
+                    <th><i class="bi bi-boxes"></i> Quantité en stock</th>
+                    <td>
+                      {{ produit.quantite }} unité{{ produit.quantite|pluralize:"s" }}
+                      {% if produit.quantite > 20 %}
+                        <span class="badge bg-success ms-2">En stock</span>
+                      {% elif produit.quantite > 0 %}
+                        <span class="badge bg-warning ms-2">Stock faible</span>
+                      {% else %}
+                        <span class="badge bg-danger ms-2">Rupture</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th><i class="bi bi-currency-euro"></i> Prix</th>
+                    <td>{{ produit.price|floatformat:2 }} dt</td>
+                  </tr>
+                  <tr>
+                    <th><i class="bi bi-card-text"></i> Description</th>
+                    <td>{{ produit.description|linebreaksbr }}</td>
+                  </tr>
+                  <tr>
+                    <th><i class="bi bi-calendar-plus"></i> Date d'ajout</th>
+                    <td>{{ produit.date_ajout|date:"d/m/Y H:i" }}</td>
+                  </tr>
+                  <tr>
+                    <th><i class="bi bi-calendar-x"></i> Date d'expiration</th>
+                    <td>
+                      {% if produit.date_expiration %}
+                        {{ produit.date_expiration|date:"d/m/Y" }}
+                      {% else %}
+                        -
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th><i class="bi bi-calendar-check"></i> Dernière modification</th>
+                    <td>
+                      {% if produit.date_modification %}
+                        {{ produit.date_modification|date:"d/m/Y H:i" }}
+                      {% else %}
+                        -
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% if produit.code_barre %}
+                  <tr>
+                    <th><i class="bi bi-upc-scan"></i> Code barres</th>
+                    <td>{{ produit.code_barre }}</td>
+                  </tr>
+                  {% endif %}
+                  {% if produit.fournisseur %}
+                  <tr>
+                    <th><i class="bi bi-building"></i> Fournisseur</th>
+                    <td>{{ produit.fournisseur }}</td>
+                  </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+            <!-- Stock progress bar -->
+            <div class="mb-4">
+              <label class="form-label">Niveau du stock:</label>
+              <div class="progress" style="height: 25px;">
+                {% if produit.quantite > 20 %}
+                  <div class="progress-bar bg-success" role="progressbar" style="width: 100%;" aria-valuenow="{{ produit.quantite }}" aria-valuemin="0" aria-valuemax="100">
+                    {{ produit.quantite }} unité{{ produit.quantite|pluralize:"s" }}
+                  </div>
+                {% elif produit.quantite > 0 %}
+                  <div class="progress-bar bg-warning" role="progressbar" style="width: {% widthratio produit.quantite 20 100 %}%;" aria-valuenow="{{ produit.quantite }}" aria-valuemin="0" aria-valuemax="20">
+                    {{ produit.quantite }} unité{{ produit.quantite|pluralize:"s" }}
+                  </div>
+                {% else %}
+                  <div class="progress-bar bg-danger" role="progressbar" style="width: 100%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    Rupture de stock
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="mt-4 p-3 bg-light rounded">
+              <h5><i class="bi bi-info-circle"></i> Informations supplémentaires</h5>
+              <p class="mb-0">
+                Ce produit a été ajouté le {{ produit.date_ajout|date:"d/m/Y" }} et
+                {% if produit.date_expiration %}
+                  expirera le {{ produit.date_expiration|date:"d/m/Y" }}.
+                {% else %}
+                  n'a pas de date d'expiration définie.
+                {% endif %}
+              </p>
+              {% if produit.notes %}
+              <div class="mt-2">
+                <strong><i class="bi bi-journal-text"></i> Notes:</strong>
+                <p>{{ produit.notes }}</p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
