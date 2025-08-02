@@ -68,4 +68,6 @@ class facture_client(models.Model):
         def __str__(self):
             return f"Facture {self.id} - {self.vente.produit.name}"
         
+
+        
         

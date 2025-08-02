@@ -16,15 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
-from UTILISATEUR.views import connecter_compte
-
-
+from UTILISATEUR.views import connecter_compte, Cration_Compte, verification_Mail, changement_code, Deconnection
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('Produits.urls')),
+    path('', include('Produits.urls')), 
     path('produits/', include('Produits.urls')),
     path('utilisateur/', include('UTILISATEUR.urls')),
     path('connecter/', connecter_compte, name='login'),
-  
+    path('creation/', Cration_Compte, name='creation'),
+    path('verification/', verification_Mail, name='verification'),
+    path('changement_code/<str:email>/', changement_code, name='changement_code'),
+    path('deconnection/', Deconnection, name='deconnection'),
 ]

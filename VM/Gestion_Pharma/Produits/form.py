@@ -1,4 +1,4 @@
-from .models import Produit
+from .models import Produit, Vente
 from django import forms
 
 class AjoutProduitform(forms.ModelForm):
@@ -66,4 +66,29 @@ class AjoutProduitform(forms.ModelForm):
             'required': 'L\'image est obligatoire.',
             'invalid': 'Le fichier doit être une image valide.',
             'invalid_image': 'Le fichier doit être une image valide (JPEG, PNG, GIF).'
+        }
+
+# formulaire de vente de produit
+from django import forms
+
+class VenteProduitform(forms.Form):
+    quantity = forms.IntegerField(
+        min_value=1,
+        label="Quantité",
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+    customer = forms.CharField(
+        max_length=100,
+        label="Client",
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nom du client'
+        })
+    )
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['customer'].error_messages = {
+            'required': 'Le nom du client est obligatoire.',
+            'invalid': 'Le nom du client doit être valide.'
         }

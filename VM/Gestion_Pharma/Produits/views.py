@@ -5,26 +5,32 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView
 from django.contrib import messages
 from django.views.generic import CreateView, DetailView
-from .form import AjoutProduitform
+from .form import AjoutProduitform, VenteProduitform
 from django.urls import path
 import datetime
-from .models import Produit,categorie
+from .models import Produit, categorie, customer, Vente, facture_client
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
 
 
 
 
 
-
-class Affichage(ListView):
+@login_required(login_url='login')
+def home(request):
+    produits = Produit.objects.all()
+    return render(request, 'acceil.html', {'produits': produits})
+class Affichage(LoginRequiredMixin, ListView):
     template_name = 'home.html'
     queryset = Produit.objects.all()
     
-class AjoutProduit(CreateView):
+class AjoutProduit(LoginRequiredMixin,CreateView):
     model = Produit
     form_class = AjoutProduitform
     template_name = 'ajout_donnees.html'
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('produit')
   
 def ajout_donnees(request):
     # Initialize variables with default values
@@ -82,7 +88,7 @@ def ajout_donnees(request):
                 )
                 produit.save()
                 messages.success(request, "Produit ajouté avec succès.")
-                return redirect('home')
+                return redirect('produit')
             except Exception as e:
                 messages.error(request, f"Erreur lors de l'ajout du produit : {str(e)}")
     
@@ -92,7 +98,7 @@ def ajout_donnees(request):
         "errors": errors
     })
     
-    
+
 def modifier_donnees(request, pk):
     all_categorie = categorie.objects.all()
     produit = get_object_or_404(Produit, pk=pk)  # Déplacé en HAUT de la fonction
@@ -106,7 +112,7 @@ def modifier_donnees(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Produit modifié avec succès.")
-            return redirect('home')
+            return redirect('produit')
         else:
             # Form has errors - they'll be displayed in template automatically
             messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
@@ -157,7 +163,7 @@ def modifier_donnees(request, pk):
         
         produit.save()
         messages.success(request, "Produit modifié avec succès.")
-        return redirect('home')
+        return redirect('produit')
     else:
         # GET request - initialize form with product instance
         form = AjoutProduitform(instance=produit)
@@ -171,6 +177,7 @@ def modifier_donnees(request, pk):
            
             
    # fonction suprimer
+@login_required(login_url='login')
 def suprimer(request, pk):
     try:
         produit = get_object_or_404(Produit, pk=pk)
@@ -192,6 +199,8 @@ from .models import Produit  # Remplacez par votre modèle
 from django.shortcuts import render
 from .models import Produit
 
+
+@login_required(login_url='login')
 def recherche(request):
     query = request.GET.get('q','').strip()
     
@@ -211,5 +220,81 @@ def recherche(request):
     return render(request, 'resultat_recherche.html', context)
 
 
-   
-   
+def VenteProduit(request, id):
+    produit = get_object_or_404(Produit, id=id)
+    if request.method == 'POST':
+        form = VenteProduitform(request.POST)
+        if form.is_valid():
+            quantite = form.cleaned_data['quantity']
+            customer_name = form.cleaned_data['customer']
+
+            if quantite > produit.quantite:
+                messages.error(request, "La quantité de produit à vendre est supérieure à la quantité disponible.")
+            else:
+                # Create or get customer
+                customer_obj, created = customer.objects.get_or_create(name=customer_name)
+                total_amount = produit.price * quantite
+
+                # Create sale record
+                vente = Vente(
+                    produit=produit,
+                    quantite=quantite,
+                    customer=customer_name,  # Store as string in Vente model
+                    total_amount=total_amount
+                )
+                vente.save()
+                
+                # Update product quantity
+                produit.quantite -= quantite
+                produit.save()
+                
+                messages.success(request, "Vente effectuée avec succès.")
+                return redirect('facture', sale_id=vente.id)
+    else:
+        form = VenteProduitform()
+
+    warning = None
+    if produit.quantite <= 5:
+        warning = 'Attention, le stock est bas !'
+
+    context = {
+        'form': form,
+        'produit': produit,
+        'warning': warning
+    }
+    return render(request, 'vente_produit.html', context)
+
+# Fonction pour afficher la facture
+@login_required(login_url='login')
+def Facture(request, sale_id):
+    vente = get_object_or_404(Vente, pk=sale_id)
+    customer_name = vente.customer
+    quantite = vente.quantite
+    total_amount = vente.total_amount
+    produit = vente.produit
+    sale_date = vente.date_vente
+    
+    context = {
+        'sale': vente,
+        'customer': customer_name,
+        'quantite': quantite,
+        'total_amount': total_amount,
+        'id': vente.id,
+        'prix_unitaire': produit.price,
+        'produit': produit,
+        'sale_date': sale_date,
+    }
+    return render(request, 'facture-client.html', context)
+
+# Fonction pour enregistrer le reçu (optionnelle)
+@login_required(login_url='login')
+def facture(request, sale_id):
+    vente = get_object_or_404(Vente, pk=sale_id)
+    # Redirect directly to the invoice display
+    return redirect('facture', sale_id=vente.id)
+
+
+
+
+
+
